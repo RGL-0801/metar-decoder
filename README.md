@@ -5,8 +5,8 @@ A small Python program that reads METAR weather reports from a text file, extrac
 ## What it does
 
 - Reads METAR lines from `metars.txt`
-- Extracts the station, time, wind direction, wind speed, and temperature (including negative temperatures written as `M02`)   
-- Extracts visibility, weather, clouds, altimeter, wind gusts and variable wind.
+- Extracts the station, time, wind direction, wind speed, and temperature (including negative temperatures written as `M02`)
+- Extracts visibility, weather, clouds, altimeter, wind gusts and variable wind direction.
 - Skips malformed lines and prints which line was skipped
 - Lists stations with wind speed above 10 knots
 - Calculates the average temperature across all valid reports
@@ -71,8 +71,8 @@ It also prints the full list of parsed reports before the summary. I skipped it 
 
 - ~~Move all the parsing processes to its dedicated function (`parse_metar()`)~~
 - ~~Parse gusts and variable winds~~
+- Identify tokens by their format instead of their position.
 - Be able to identify and parse three digit wind speeds
 - Handle CAVOK, RMK, and RVRs inside the raw METAR data
 - Handle AUTO and METAR prefixes
 - Store dew point values
-- Identify tokens by their format instead of their position.
