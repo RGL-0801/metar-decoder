@@ -40,16 +40,52 @@ def get_visibility(visibility_token):
 
 
 def parse_metar(raw_metar):
-    clean_up = raw_metar.strip().split()
+    # Declaring Variables
+    visibility_token = None
+    station = None
+    time = None
+    wind_token = None
+    sky_wxr_token = []
+    temp_token = None
+    rvr_token = None
+    altimeter = None
+    cloud_prefixes = ("FEW","SCT","BKN","OVC","VV")
 
-    # Raw Parsed Info
-    station = clean_up[0]
-    time = clean_up[1]
-    wind_token = clean_up[2]
-    visibility_token = clean_up[3]
-    sky_wxr_token = clean_up[4:-2]
-    temp_token = clean_up[-2]
-    altimeter = clean_up[-1]
+    clean_up = raw_metar.strip().split()
+    # For Loop Parsing by Category
+    for token in clean_up:
+        if len(token) == 4:
+            if  token == "AUTO":
+                continue
+            if token.isdigit():
+                visibility_token = token
+            elif station != None:
+                sky_wxr_token.append(token)
+            else:
+                station = token
+        elif token.endswith("Z") :
+            time = token
+        elif token.endswith("KT"):
+            wind_token = token
+        elif token.startswith(cloud_prefixes):
+            sky_wxr_token.append(token)
+        elif token.startswith("R") and "/" in token:
+            rvr_token = token
+        elif "/" in token:
+            temp_token = token
+        elif token.startswith("Q") or token.startswith("A"):
+            altimeter = token
+        elif token == "RMK":
+            break
+        else:
+            if token == "METAR":
+                continue
+            elif token == "CAVOK":
+                visibility_token = token
+            elif station != None:
+                sky_wxr_token.append(token)
+
+
 
     # Call Ups
     wind = get_wind(wind_token)
@@ -75,7 +111,7 @@ with open("metars.txt") as file:
     for raw_metar in file:
         try:
             cleaned_report.append(parse_metar(raw_metar))
-        except (ValueError, IndexError):
+        except (ValueError, IndexError, TypeError):
             print(f"Mistake on METAR report: {raw_metar.strip()}")
         
 #Full Report

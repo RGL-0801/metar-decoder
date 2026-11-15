@@ -1,4 +1,4 @@
-# METAR Decoder v1.2
+# METAR Decoder v1.3
 
 A small Python program that reads METAR weather reports from a text file, extracts key values into structured data, and prints a short summary.
 
@@ -11,6 +11,7 @@ A small Python program that reads METAR weather reports from a text file, extrac
 - Lists stations with wind speed above 10 knots
 - Calculates the average temperature across all valid reports
 - Parsing is split into `parse_metar()` and its helper functions
+- Identifies each token by its format instead of position.
 
 ## How to run it
 
@@ -30,7 +31,7 @@ MHLM
 MPTO
 
  --AVERAGE TEMPERATURE--
-20.7 degrees Celsius.
+22.1 degrees Celsius.
 
 --PROGRAM COMPLETE--
 ```
@@ -45,12 +46,14 @@ It also prints the full list of parsed reports before the summary. I skipped it 
 - two lines with negative temperatures or dew points to test the `M` prefix
 - one line with wind gusts to test the `G` prefix (v1.2)
 - one line with `VRB` to test variable wind identification (v1.2)
+- one line with `CAVOK` and `RMK` to test handling CAVOK visibility and RMK limit.
+- one line with `AUTO` to test filtering of AUTO and `METAR` prefix.
+- one line with `-RA` to test new weather abbreviations.
 
 ## Known limitations
 
 - Parsing three digit winds
-- Handling CAVOK, RMK, and RVR
-- Handling AUTO and METAR prefixes producing wrong values
+- Interpreting CAVOK, RMK, and RVR
 - Ignores variable wind group (like "010V070")
 - Doesn't store dew point
 
@@ -66,13 +69,14 @@ It also prints the full list of parsed reports before the summary. I skipped it 
 - Writing helper functions
 - Refactoring without changing the output
 - Guarding against division by zero
+- Planning improvements and categorizing data
 
 ## Planned improvements
 
 - ~~Move all the parsing processes to its dedicated function (`parse_metar()`)~~
 - ~~Parse gusts and variable winds~~
-- Identify tokens by their format instead of their position.
+- ~~Identify tokens by their format instead of their position.~~
 - Be able to identify and parse three digit wind speeds
-- Handle CAVOK, RMK, and RVRs inside the raw METAR data
-- Handle AUTO and METAR prefixes
+- Interpret CAVOK, RMK, and RVRs inside the raw METAR data
+- ~~Handle AUTO and METAR prefixes~~
 - Store dew point values
