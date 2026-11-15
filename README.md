@@ -1,4 +1,4 @@
-# METAR Decoder v1.3
+# METAR Decoder v1.4
 
 A small Python program that reads METAR weather reports from a text file, extracts key values into structured data, and prints a short summary.
 
@@ -31,7 +31,7 @@ MHLM
 MPTO
 
  --AVERAGE TEMPERATURE--
-22.1 degrees Celsius.
+22.6 degrees Celsius.
 
 --PROGRAM COMPLETE--
 ```
@@ -49,13 +49,13 @@ It also prints the full list of parsed reports before the summary. I skipped it 
 - one line with `CAVOK` and `RMK` to test handling CAVOK visibility and RMK limit.
 - one line with `AUTO` to test filtering of AUTO and `METAR` prefix.
 - one line with `-RA` to test new weather abbreviations.
+- one line with no `dew_point` to see how it handles the abscence of dew point data
 
 ## Known limitations
 
 - Parsing three digit winds
 - Interpreting CAVOK, RMK, and RVR
 - Ignores variable wind group (like "010V070")
-- Doesn't store dew point
 
 ## What I practiced
 
@@ -79,4 +79,4 @@ It also prints the full list of parsed reports before the summary. I skipped it 
 - Be able to identify and parse three digit wind speeds
 - Interpret CAVOK, RMK, and RVRs inside the raw METAR data
 - ~~Handle AUTO and METAR prefixes~~
-- Store dew point values
+- ~~Store dew point values~~
