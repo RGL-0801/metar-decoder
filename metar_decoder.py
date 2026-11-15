@@ -1,10 +1,20 @@
 def get_temp(temp_token):
+    temp_dictionary = {"temperature": None, "dew_point": None}
     temperature_split = temp_token.split("/")
     if "M" in temperature_split[0]:
         temperature = int(temp_token[1:3]) * -1
     else:
         temperature = int(temp_token[0:2])
-    return temperature
+    dew_point = temperature_split[1]
+    if dew_point == "":
+        dew_point = None
+    elif "M" in temperature_split[1]:
+        dew_point = int(temp_token[5:7]) * -1
+    else:
+        dew_point = int(temp_token[4:6])
+    temp_dictionary["temperature"] = temperature
+    temp_dictionary["dew_point"] = dew_point
+    return temp_dictionary
 
 def get_wind(wind_token):
     if "VRB" in wind_token:
@@ -101,7 +111,8 @@ def parse_metar(raw_metar):
                         "visibility": visibility["visibility"],
                         "weather": sky_weather["weather"],
                         "clouds": sky_weather["sky"],
-                        "temperature_C": temperature,
+                        "temperature_C": temperature["temperature"],
+                        "dew_point": temperature["dew_point"],
                         "altimeter": altimeter}
     return metar_dictionary
 
