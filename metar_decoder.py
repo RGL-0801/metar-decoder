@@ -2,21 +2,27 @@ def get_temp(temp_token):
     temp_dictionary = {"temperature": None, "dew_point": None}
     temperature_split = temp_token.split("/")
     if "M" in temperature_split[0]:
-        temperature = int(temp_token[1:3]) * -1
+        temperature = int(temperature_split[0][1:]) * -1
     else:
-        temperature = int(temp_token[0:2])
+        temperature = int(temperature_split[0])
     dew_point = temperature_split[1]
     if dew_point == "":
         dew_point = None
     elif "M" in temperature_split[1]:
-        dew_point = int(temp_token[5:7]) * -1
+        dew_point = int(temperature_split[1][1:]) * -1
     else:
-        dew_point = int(temp_token[4:6])
+        dew_point = int(temperature_split[1])
     temp_dictionary["temperature"] = temperature
     temp_dictionary["dew_point"] = dew_point
     return temp_dictionary
 
-def get_wind(wind_token):
+def get_wind(wind_token, variable_wind_token=None):
+    start_vrb_wind = None
+    end_vrb_wind = None
+    if variable_wind_token != None:
+        variable_wind_split = variable_wind_token.split("V")
+        start_vrb_wind = int(variable_wind_split[0])
+        end_vrb_wind = int(variable_wind_split[1])
     wind_token_fixed = wind_token.removesuffix("KT")
     if "VRB" in wind_token_fixed:
         wind_direction = None
@@ -29,7 +35,11 @@ def get_wind(wind_token):
     else:
         wind_gust = None
         wind_speed = int(wind_token_fixed[3:])
-    wind_dictionary = {"direction": wind_direction, "speed": wind_speed, "gust": wind_gust}
+    wind_dictionary = {"direction": wind_direction, 
+                       "speed": wind_speed, 
+                       "gust": wind_gust, 
+                       "variable_wind_start": start_vrb_wind, 
+                       "variable_wind_end":end_vrb_wind}
     return wind_dictionary
 
 def get_weather(sky_wxr_token):
@@ -58,6 +68,7 @@ def parse_metar(raw_metar):
     station = None
     time = None
     wind_token = None
+    variable_wind_token = None
     sky_wxr_token = []
     temp_token = None
     rvr_token = None
@@ -80,6 +91,8 @@ def parse_metar(raw_metar):
             time = token
         elif token.endswith("KT"):
             wind_token = token
+        elif len(token) == 7 and token[3] == "V" and token[0:3].isdigit() and token[4:7].isdigit():
+            variable_wind_token = token
         elif token.startswith(cloud_prefixes):
             sky_wxr_token.append(token)
         elif token.startswith("R") and "/" in token:
@@ -101,7 +114,7 @@ def parse_metar(raw_metar):
 
 
     # Call Ups
-    wind = get_wind(wind_token)
+    wind = get_wind(wind_token, variable_wind_token)
     visibility = get_visibility(visibility_token)
     sky_weather = get_weather(sky_wxr_token)
     temperature = get_temp(temp_token)
@@ -111,6 +124,8 @@ def parse_metar(raw_metar):
                         "wind_speed": wind["speed"], 
                         "wind_direction": wind["direction"], 
                         "wind_gust": wind["gust"],
+                        "variable_wind_start": wind["variable_wind_start"],
+                        "variable_wind_end": wind["variable_wind_end"],
                         "visibility": visibility["visibility"],
                         "weather": sky_weather["weather"],
                         "clouds": sky_weather["sky"],
