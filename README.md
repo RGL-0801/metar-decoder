@@ -8,6 +8,7 @@ A small Python program that reads METAR weather reports from a text file, extrac
 - Extracts the station, time, wind direction, wind speed, temperature and dew point (including negative values written as `M02`)
 - Extracts visibility, weather, clouds and altimeter
 - Handles wind gusts (`G`), variable wind (`VRB`) and two- or three-digit wind speeds (e.g. `270105G120KT`)
+- Decodes the variable wind direction group (e.g. `010V070` → varying between 010° and 070°)
 - Stores dew point as `None` when it is missing (e.g. `27/`)
 - Skips malformed lines and prints which line was skipped
 - Lists stations with wind speed above 10 knots
@@ -17,11 +18,33 @@ A small Python program that reads METAR weather reports from a text file, extrac
 
 ## How to run it
 
+Requires Python 3.9 or newer.
+
 ```
 python metar_decoder.py
 ```
 
 `metars.txt` must be in the same folder as the script.
+
+## Output fields
+
+Each parsed report is a dictionary with these keys:
+
+| Key | Example | Meaning |
+|---|---|---|
+| `origin` | `MHTG` | Station code |
+| `time` | `051500Z` | Day and time (UTC) |
+| `wind_direction` | `240` | Degrees, `None` for `VRB` |
+| `wind_speed` | `10` | Knots |
+| `wind_gust` | `25` | Knots, `None` if no gust |
+| `variable_wind_start` | `10` | Degrees, `None` if not reported |
+| `variable_wind_end` | `70` | Degrees, `None` if not reported |
+| `visibility` | `9999` | Meters, or `CAVOK` |
+| `weather` | `['-RA']` | Weather codes |
+| `clouds` | `['FEW040']` | Cloud layers |
+| `temperature_C` | `27` | Degrees Celsius |
+| `dew_point` | `15` | Degrees Celsius, `None` if missing |
+| `altimeter` | `A3012` | Altimeter setting |
 
 ## Example output
 
@@ -56,11 +79,10 @@ It also prints the full list of parsed reports before the summary. I left it out
 - one line with no dew point (`27/`) to test missing data
 - lines with three-digit wind speeds and gusts (`270105G120KT`, `090105KT`)
 - one line with `VRB` and a gust (`VRB05G15KT`)
-- one line with a variable wind group (`010V070`), not decoded yet
+- one line with a variable wind group (`010V070`)
 
 ## Known limitations
 
-- The variable wind group (like `010V070`) is not decoded yet; it currently ends up in the weather list
 - CAVOK, RMK and RVR are recognised but not interpreted
 
 ## What I practiced
@@ -70,11 +92,12 @@ It also prints the full list of parsed reports before the summary. I left it out
 - Lists and dictionaries
 - Loops and conditions
 - Handling errors with `try/except`
-- Handling variations in format with `.startswith()`
-- Writing helper functions that `return` values
+- Handling variations in format with `.startswith()` and `.isdigit()`
+- Writing helper functions that `return` values, including optional arguments
 - Refactoring without changing the output
 - Guarding against division by zero
 - Slicing from the front instead of fixed positions, so values of different lengths still work
+- Writing precise checks so one token type isn't mistaken for another (`010V070` vs `VRB03KT`)
 - Testing with expected results and checking that no lines were silently dropped
 
 ## Planned improvements
