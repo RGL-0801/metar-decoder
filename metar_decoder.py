@@ -17,15 +17,18 @@ def get_temp(temp_token):
     return temp_dictionary
 
 def get_wind(wind_token):
-    if "VRB" in wind_token:
+    wind_token_fixed = wind_token.removesuffix("KT")
+    if "VRB" in wind_token_fixed:
         wind_direction = None
     else:
-        wind_direction = int(wind_token[0:3])
-    if "G" in wind_token:
-        wind_gust = int(wind_token[6:8])
+        wind_direction = int(wind_token_fixed[0:3])
+    if "G" in wind_token_fixed:
+        wind_token_gust = wind_token_fixed.split("G")
+        wind_speed = int(wind_token_gust[0][3:])
+        wind_gust = int(wind_token_gust[1][0:])
     else:
         wind_gust = None
-    wind_speed = int(wind_token[3:5])
+        wind_speed = int(wind_token_fixed[3:])
     wind_dictionary = {"direction": wind_direction, "speed": wind_speed, "gust": wind_gust}
     return wind_dictionary
 
@@ -122,7 +125,7 @@ with open("metars.txt") as file:
     for raw_metar in file:
         try:
             cleaned_report.append(parse_metar(raw_metar))
-        except (ValueError, IndexError, TypeError):
+        except (ValueError, IndexError, TypeError, AttributeError):
             print(f"Mistake on METAR report: {raw_metar.strip()}")
         
 #Full Report
