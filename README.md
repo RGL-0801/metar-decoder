@@ -1,4 +1,4 @@
-# METAR Decoder v1.5
+# METAR Decoder v1.6
 
 A small Python program that reads METAR weather reports from a text file, extracts key values into structured data, and prints a short summary.
 
@@ -85,6 +85,6 @@ It also prints the full list of parsed reports before the summary. I left it out
 - ~~Handle AUTO and METAR prefixes~~
 - ~~Store dew point values~~
 - ~~Parse three-digit wind speeds~~
-- Decode the variable wind group (`010V070`)
+- ~~Decode the variable wind group (`010V070`)~~
 - Interpret CAVOK, RMK and RVRs
 - Analyse real METAR data with pandas
