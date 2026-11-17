@@ -1,4 +1,4 @@
-# METAR Decoder v1.6
+# METAR Decoder v1.7
 
 A small Python program that reads METAR weather reports from a text file, extracts key values into structured data, and prints a short summary.
 
@@ -11,14 +11,20 @@ A small Python program that reads METAR weather reports from a text file, extrac
 - Decodes the variable wind direction group (e.g. `010V070` → varying between 010° and 070°)
 - Stores dew point as `None` when it is missing (e.g. `27/`)
 - Skips malformed lines and prints which line was skipped
-- Lists stations with wind speed above 10 knots
+- Loads the parsed reports into a pandas DataFrame
+- Lists stations with wind speed above 10 knots (with their wind speed)
 - Calculates the average temperature across all valid reports
+- Prints "NO DATA AVAILABLE!" instead of crashing if no report could be parsed
 - Parsing is split into `parse_metar()` and its helper functions
 - Identifies each token by its format instead of its position
 
 ## How to run it
 
-Requires Python 3.9 or newer.
+Requires Python 3.9 or newer and pandas:
+
+```
+pip install pandas
+```
 
 ```
 python metar_decoder.py
@@ -52,18 +58,19 @@ Each parsed report is a dictionary with these keys:
 Mistake on METAR report: MHSC 051500Z
 
  --STATIONS ABOVE 10KTS--
-MHLM
-MPTO
-MHDD
-MHEE
+   origin  wind_speed
+1    MHLM          12
+3    MPTO          15
+10   MHDD         105
+11   MHEE         105
 
  --AVERAGE TEMPERATURE--
-23.9 degrees Celsius.
+23.86 degrees Celsius
 
 --PROGRAM COMPLETE--
 ```
 
-It also prints the full list of parsed reports before the summary. I left it out here because it is too long.
+It also prints the full list of parsed reports before the summary. I left it out here because it is too long. The numbers on the left of the station table are the row numbers (index) from the full DataFrame.
 
 ## About the data
 
@@ -99,6 +106,7 @@ It also prints the full list of parsed reports before the summary. I left it out
 - Slicing from the front instead of fixed positions, so values of different lengths still work
 - Writing precise checks so one token type isn't mistaken for another (`010V070` vs `VRB03KT`)
 - Testing with expected results and checking that no lines were silently dropped
+- pandas basics: creating a DataFrame, selecting columns, filtering rows, `.mean()` and `df.empty`
 
 ## Planned improvements
 
@@ -110,4 +118,6 @@ It also prints the full list of parsed reports before the summary. I left it out
 - ~~Parse three-digit wind speeds~~
 - ~~Decode the variable wind group (`010V070`)~~
 - Interpret CAVOK, RMK and RVRs
+- ~~Rewrite the summaries with pandas~~
+- Add a temperature/dew point spread column (fog risk)
 - Analyse real METAR data with pandas

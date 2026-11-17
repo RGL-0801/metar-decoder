@@ -1,3 +1,5 @@
+import pandas as pd
+
 def get_temp(temp_token):
     temp_dictionary = {"temperature": None, "dew_point": None}
     temperature_split = temp_token.split("/")
@@ -146,24 +148,23 @@ with open("metars.txt") as file:
 #Full Report
 print(cleaned_report)
 
+#PANDAS
+df = pd.DataFrame(cleaned_report)
+
 #Wind Speeds
 print("\n --STATIONS ABOVE 10KTS--")
-
-for report in cleaned_report:
-    if report["wind_speed"] > 10:
-        print(report["origin"])
-
-# Temperature Average
-total_temperature = 0
-for report in cleaned_report:
-    total_temperature += report["temperature_C"]
-
-if len(cleaned_report) != 0:
-    average_temperature = total_temperature / len(cleaned_report)
-    print("\n --AVERAGE TEMPERATURE--")
-    print(f"{average_temperature:.1f} degrees Celsius.")
+if df.empty:
+    print("NO DATA AVAILABLE!")
 else:
-    print("No data available!")
+    wnd_speed_10 = df[df["wind_speed"] > 10]
+    print(wnd_speed_10[["origin", "wind_speed"]])
+
+# Avg Temperature
+print("\n --AVERAGE TEMPERATURE--")
+if df.empty:
+    print("NO DATA AVAILABLE!")
+else:
+    avg_temperature = df["temperature_C"].mean()
+    print(f"{avg_temperature:.2f} degrees Celsius")
 
 print("\n--PROGRAM COMPLETE--")
-
